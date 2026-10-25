@@ -1,0 +1,775 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Multimedios en el aula virtual</title>
+<style>
+  /* ============================================================
+     DESIGN PLAN
+     Layout: a working "cuaderno de planeación" — a left tick-rail of
+     numbered stops (1–6) walks the visitor through a real learning
+     path (leer → ver → practicar → decidir → verificar → cerrar);
+     each stop is a single card, consistent padding, ~760px reading
+     column, centered.
+     Color: institutional Anáhuac Online orange as the sole accent,
+     on warm (not pure) neutrals; status colors reserved for
+     correct/incorrect feedback and the checklist's "listo" state.
+     Type: Arial throughout (the institutional spec on the uploaded
+     Anáhuac Online format guide requires it) — hierarchy comes from
+     weight, size and letter-spacing, not a second family.
+     ============================================================ */
+  :root{
+    --bg:          #FBF8F5;
+    --surface:     #FFFFFF;
+    --surface-2:   #F2ECE4;
+    --border:      #E4DBD0;
+    --ink:         #241E18;
+    --ink-soft:    #5B5247;
+    --muted:       #8B8075;
+    --accent:      #FF5900;      /* true Anáhuac Online orange — decorative use */
+    --accent-text: #C7440A;      /* darkened for AA text/buttons on light */
+    --accent-head: #E24E0A;      /* heading accent, AA for large/bold text */
+    --accent-soft: #FFE4D2;
+    --link:        #A8390A;
+    --good:        #0ca30c;
+    --good-bg:     #E4F6E1;
+    --critical:    #d03b3b;
+    --critical-bg: #FBE6E6;
+    --ring:        #C7440A;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:          #1C1712;
+      --surface:     #241E18;
+      --surface-2:   #2C251D;
+      --border:      #3C332A;
+      --ink:         #F3ECE2;
+      --ink-soft:    #CDC1B3;
+      --muted:       #9C9082;
+      --accent:      #FF7A3D;
+      --accent-text: #FFA164;
+      --accent-head: #FF8A4C;
+      --accent-soft: #3A2318;
+      --link:        #FFB088;
+      --good:        #39c73f;
+      --good-bg:     #16331a;
+      --critical:    #ff6b6b;
+      --critical-bg: #3a1a1a;
+      --ring:        #FFA164;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:          #1C1712;
+    --surface:     #241E18;
+    --surface-2:   #2C251D;
+    --border:      #3C332A;
+    --ink:         #F3ECE2;
+    --ink-soft:    #CDC1B3;
+    --muted:       #9C9082;
+    --accent:      #FF7A3D;
+    --accent-text: #FFA164;
+    --accent-head: #FF8A4C;
+    --accent-soft: #3A2318;
+    --link:        #FFB088;
+    --good:        #39c73f;
+    --good-bg:     #16331a;
+    --critical:    #ff6b6b;
+    --critical-bg: #3a1a1a;
+    --ring:        #FFA164;
+    color-scheme: dark;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family: Arial, Helvetica, "Liberation Sans", sans-serif;
+    line-height:1.55;
+    padding-left:max(16px, env(safe-area-inset-left,0px));
+    padding-right:max(16px, env(safe-area-inset-right,0px));
+  }
+  h1,h2,h3{ text-wrap:balance; font-weight:800; margin:0; }
+  p{ margin:0; }
+  img{ max-width:100%; }
+  a{ color:var(--link); }
+  a:not(.btn):not(.navlink){ text-underline-offset:2px; }
+  :focus-visible{ outline:3px solid var(--ring); outline-offset:2px; border-radius:4px; }
+  .skip-link{
+    position:absolute; left:-9999px; top:auto;
+    background:var(--accent-text); color:#fff; padding:10px 16px;
+    border-radius:0 0 8px 0; z-index:100; font-weight:700; text-decoration:none;
+  }
+  .skip-link:focus{ left:0; top:0; }
+
+  .wrap{ max-width:820px; margin:0 auto; padding-block:28px 64px; }
+
+  /* ---------- Header ---------- */
+  .topbar{ height:6px; background:linear-gradient(90deg,var(--accent),var(--accent-head)); margin:0 calc(-1 * max(16px, env(safe-area-inset-left,0px))) 0 calc(-1 * max(16px, env(safe-area-inset-right,0px))); }
+  header.hero{ padding-top:22px; }
+  .brandrow{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:26px; }
+  .brandrow img{ height:30px; width:auto; display:block; }
+  .texttools{ display:flex; gap:6px; align-items:center; }
+  .texttools button{
+    font-family:inherit; font-weight:700; font-size:13px; line-height:1;
+    background:var(--surface); color:var(--ink-soft); border:1.5px solid var(--border);
+    border-radius:8px; padding:7px 10px; cursor:pointer;
+  }
+  .texttools button:hover{ border-color:var(--accent-text); color:var(--accent-text); }
+  .eyebrow{
+    display:inline-block; font-size:12.5px; font-weight:800; letter-spacing:1.6px;
+    text-transform:uppercase; color:var(--accent-text); margin-bottom:10px;
+  }
+  h1{ font-size:clamp(1.7rem, 4.2vw, 2.4rem); color:var(--ink); letter-spacing:-0.01em; }
+  .dek{ font-size:17px; color:var(--ink-soft); margin-top:12px; max-width:62ch; }
+  .byline{ margin-top:18px; font-size:13px; color:var(--muted); }
+  .byline b{ color:var(--ink-soft); }
+
+  .a11y-note{
+    margin-top:22px; padding:14px 16px; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:10px;
+    font-size:13.5px; color:var(--ink-soft); display:flex; gap:10px;
+  }
+  .a11y-note svg{ flex:none; width:19px; height:19px; margin-top:2px; }
+
+  /* ---------- Section nav ---------- */
+  nav.jump{
+    display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 0 0;
+    padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  }
+  nav.jump a{
+    font-size:13px; font-weight:700; color:var(--ink-soft); text-decoration:none;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:999px;
+    padding:7px 13px; white-space:nowrap;
+  }
+  nav.jump a:hover{ color:var(--accent-text); border-color:var(--accent-text); }
+
+  /* ---------- Section shell ---------- */
+  section.stop{ margin-top:46px; scroll-margin-top:16px; }
+  .stopnum{
+    display:flex; align-items:center; gap:14px; margin-bottom:16px;
+  }
+  .stopnum .n{
+    flex:none; width:34px; height:34px; border-radius:50%;
+    background:var(--accent-soft); color:var(--accent-text); font-weight:800; font-size:14px;
+    display:flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums;
+  }
+  .stopnum h2{ font-size:1.32rem; color:var(--ink); }
+  .stop-sub{ color:var(--ink-soft); font-size:14.5px; margin:-6px 0 18px 48px; max-width:64ch; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:22px 24px;
+  }
+  .card + .card{ margin-top:14px; }
+
+  .lead{ font-size:16px; color:var(--ink-soft); max-width:68ch; }
+  .lead + .lead{ margin-top:12px; }
+
+  /* ---------- Explainer (storyboard) ---------- */
+  .board{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+  }
+  .frame{
+    position:relative; min-height:200px; padding:30px 26px 24px;
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px;
+  }
+  .frame .icon{ width:64px; height:64px; color:var(--accent-text); }
+  .frame .rule-no{
+    font-size:12px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted);
+  }
+  .frame .rule-title{ font-size:1.05rem; font-weight:800; max-width:46ch; }
+  .dots{ display:flex; gap:7px; justify-content:center; padding:4px 0 18px; }
+  .dot{ width:7px; height:7px; border-radius:50%; background:var(--border); border:none; padding:0; cursor:pointer; }
+  .dot[aria-current="true"]{ background:var(--accent-text); width:20px; border-radius:5px; }
+  .captionbar{
+    background:var(--surface-2); border-top:1px solid var(--border);
+    padding:14px 20px; font-size:14px; color:var(--ink-soft); min-height:3.3em; display:flex; align-items:center;
+  }
+  .controls{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:14px 20px 20px;
+  }
+  .ctl-btn{
+    font-family:inherit; font-weight:700; font-size:13.5px; cursor:pointer;
+    background:var(--surface); border:1.5px solid var(--border); color:var(--ink-soft);
+    border-radius:9px; padding:9px 14px; display:inline-flex; align-items:center; gap:7px;
+  }
+  .ctl-btn:hover{ border-color:var(--accent-text); color:var(--accent-text); }
+  .ctl-btn.primary{ background:var(--accent-text); border-color:var(--accent-text); color:#fff; }
+  .ctl-btn.primary:hover{ opacity:.92; }
+  details.transcript{ margin:0 20px 20px; border-top:1px solid var(--border); padding-top:14px; }
+  details.transcript summary{ cursor:pointer; font-weight:700; font-size:13.5px; color:var(--accent-text); }
+  details.transcript .t-body{ margin-top:10px; font-size:14px; color:var(--ink-soft); }
+  details.transcript .t-body p + p{ margin-top:8px; }
+
+  /* ---------- Quiz ---------- */
+  fieldset.q{ border:none; margin:0; padding:0; }
+  fieldset.q + fieldset.q{ margin-top:18px; padding-top:18px; border-top:1px solid var(--border); }
+  fieldset.q legend{ font-weight:700; font-size:15px; color:var(--ink); padding:0 0 10px; float:left; width:100%; }
+  .opt{
+    display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border:1.5px solid var(--border);
+    border-radius:9px; margin-top:8px; cursor:pointer; font-size:14.5px; color:var(--ink-soft);
+  }
+  .opt:hover{ border-color:var(--accent-text); }
+  .opt input{ margin-top:3px; flex:none; width:16px; height:16px; accent-color:var(--accent-text); }
+  .qfeedback{
+    display:none; margin-top:10px; padding:10px 12px; border-radius:9px; font-size:13.5px; gap:8px;
+  }
+  .qfeedback.show{ display:flex; }
+  .qfeedback.ok{ background:var(--good-bg); color:var(--ink); }
+  .qfeedback.bad{ background:var(--critical-bg); color:var(--ink); }
+  .qfeedback svg{ flex:none; width:17px; height:17px; margin-top:1px; }
+  .qfeedback.ok svg{ color:var(--good); }
+  .qfeedback.bad svg{ color:var(--critical); }
+  .quizfoot{ margin-top:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  #quizScore{ font-weight:800; font-size:14.5px; }
+  #quizScore.hidden{ display:none; }
+
+  /* ---------- Caso práctico ---------- */
+  .scenario-people{ display:flex; gap:16px; flex-wrap:wrap; margin:16px 0 0; }
+  .person{
+    flex:1 1 220px; display:flex; gap:10px; padding:12px; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:10px;
+  }
+  .person .av{
+    flex:none; width:38px; height:38px; border-radius:50%; background:var(--accent-soft);
+    color:var(--accent-text); display:flex; align-items:center; justify-content:center; font-weight:800;
+  }
+  .person strong{ display:block; font-size:14px; }
+  .person span{ display:block; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+
+  .decision{ margin-top:18px; padding-top:18px; border-top:1px solid var(--border); }
+  .decision:first-of-type{ border-top:none; margin-top:20px; padding-top:0; }
+  .decision h3{ font-size:15px; margin-bottom:10px; }
+  .choice-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:560px){ .choice-row{ grid-template-columns:1fr; } }
+  .choice{
+    text-align:left; font-family:inherit; font-size:13.8px; color:var(--ink-soft);
+    background:var(--surface); border:1.5px solid var(--border); border-radius:10px;
+    padding:12px 13px; cursor:pointer; min-width:0;
+  }
+  .choice:hover{ border-color:var(--accent-text); }
+  .choice[aria-pressed="true"]{ border-color:var(--accent-text); background:var(--accent-soft); color:var(--ink); }
+  .choice[data-good="true"][aria-pressed="true"]{ border-color:var(--good); background:var(--good-bg); }
+  .choice[data-good="false"][aria-pressed="true"]{ border-color:var(--critical); background:var(--critical-bg); }
+  .dfeedback{ margin-top:9px; font-size:13px; color:var(--ink-soft); display:none; }
+  .dfeedback.show{ display:block; }
+  .plan-box{
+    margin-top:24px; padding:18px 20px; border-radius:12px; background:var(--surface-2);
+    border:1px solid var(--border);
+  }
+  .plan-box h3{ font-size:14.5px; margin-bottom:8px; }
+  #planText{ font-size:14px; color:var(--ink-soft); }
+  #planText .muted-empty{ color:var(--muted); font-style:italic; }
+  #planTally{ margin-top:10px; font-size:13px; font-weight:700; color:var(--accent-text); }
+
+  /* ---------- Checklist ---------- */
+  .progress-wrap{ margin-bottom:18px; }
+  .progress-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .progress-top .label{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .progress-top .pct{ font-size:13px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--accent-text); }
+  .progress-top .pct.done{ color:var(--good); }
+  .progress-track{ height:10px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:var(--accent-text); border-radius:999px; transition:width .25s ease; }
+  .progress-fill.done{ background:var(--good); }
+  .progress-msg{ margin-top:8px; font-size:13px; color:var(--ink-soft); }
+
+  .check-item{
+    display:flex; align-items:flex-start; gap:11px; padding:11px 4px; border-top:1px solid var(--border);
+  }
+  .check-item:first-of-type{ border-top:none; }
+  .check-item input{ margin-top:3px; flex:none; width:17px; height:17px; accent-color:var(--good); }
+  .check-item label{ font-size:14.5px; color:var(--ink-soft); cursor:pointer; }
+
+  /* ---------- Closing / refs ---------- */
+  .quote{
+    border-left:3px solid var(--accent-text); padding-left:16px; font-size:15.5px; color:var(--ink-soft);
+    font-style:italic;
+  }
+  ul.refs{ list-style:none; margin:16px 0 0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  ul.refs li{ font-size:13.5px; color:var(--ink-soft); padding-left:1.6em; text-indent:-1.6em; }
+
+  footer.page{
+    margin-top:56px; padding-top:22px; border-top:1px solid var(--border);
+    font-size:12.5px; color:var(--muted); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+
+  [hidden]{ display:none !important; }
+</style>
+
+<a class="skip-link" href="#main">Saltar al contenido principal</a>
+<div class="topbar" aria-hidden="true"></div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="brandrow">
+      <img src="data:image/png;base64,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" alt="Anáhuac online">
+      <div class="texttools" role="group" aria-label="Tamaño del texto">
+        <button type="button" id="textSmaller" aria-label="Reducir tamaño del texto">Aa−</button>
+        <button type="button" id="textReset" aria-label="Restablecer tamaño del texto">Aa</button>
+        <button type="button" id="textBigger" aria-label="Aumentar tamaño del texto">Aa+</button>
+      </div>
+    </div>
+
+    <span class="eyebrow">Actividad en línea · Educación inclusiva</span>
+    <h1>Uso de multimedios en el aula virtual</h1>
+    <p class="dek">Un recorrido práctico para decidir, con criterio y no por costumbre, cómo presentar imagen, audio, video y texto en una clase virtual a la que asiste todo tipo de estudiante.</p>
+    <p class="byline">Recurso elaborado por <b>José María Jovani Rodríguez Montoya</b> · Escuela Nacional Preparatoria, UNAM · pensado para un grupo de bachillerato</p>
+
+    <div class="a11y-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span>Este recurso se navega completo con teclado, incluye texto alternativo en sus imágenes, subtítulos sincronizados en la cápsula animada y un control para ajustar el tamaño del texto. Si usa un lector de pantalla, cada sección anuncia los resultados de sus interacciones.</span>
+    </div>
+
+    <nav class="jump" aria-label="Ir a una sección">
+      <a class="navlink" href="#intro">1 · Por qué importa</a>
+      <a class="navlink" href="#explicador">2 · Tres reglas</a>
+      <a class="navlink" href="#quiz">3 · Ponte a prueba</a>
+      <a class="navlink" href="#caso">4 · Caso práctico</a>
+      <a class="navlink" href="#checklist">5 · Lista de verificación</a>
+      <a class="navlink" href="#cierre">6 · Para profundizar</a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- 1. INTRO -->
+    <section class="stop" id="intro" aria-labelledby="intro-h">
+      <div class="stopnum"><span class="n" aria-hidden="true">1</span><h2 id="intro-h">Por qué importa cómo se presentan los multimedios</h2></div>
+      <p class="stop-sub">El punto de partida antes de subir cualquier material a la plataforma del curso.</p>
+      <div class="card">
+        <p class="lead">En un aula virtual, los multimedios —texto, imagen, audio, video y animación combinados— no son un adorno: son el canal por el que cada estudiante construye su aprendizaje. Cuando ese canal está bien diseñado, abre varias rutas de acceso al mismo contenido; cuando no lo está, se convierte en una barrera silenciosa para quien tiene alguna discapacidad sensorial, motriz o cognitiva, o simplemente para quien aprende mejor por un camino distinto al que el profesor dio por obvio.</p>
+        <p class="lead">Este recurso combina dos marcos que se complementan bien. El Diseño Universal para el Aprendizaje (CAST, 2024) propone ofrecer más de una forma de representar la información, para que el estudiante elija cómo accede a ella. Las Pautas de Accesibilidad para el Contenido Web 2.2 (W3C, 2023) bajan ese principio a criterios técnicos verificables —contraste de color, subtitulado, navegación por teclado— que permiten comprobar si un material realmente es accesible o solo lo parece. A ambos se suma lo que Mayer (2021) documentó sobre cómo el cerebro procesa imagen y texto a la vez, útil para no saturar la atención del estudiante aunque el material ya sea técnicamente accesible.</p>
+        <p class="lead">Recorra las siguientes secciones en el orden que prefiera: cada una pone en práctica, de forma interactiva, una faceta distinta del uso inclusivo de multimedios en el aula virtual.</p>
+      </div>
+    </section>
+
+    <!-- 2. EXPLICADOR -->
+    <section class="stop" id="explicador" aria-labelledby="exp-h">
+      <div class="stopnum"><span class="n" aria-hidden="true">2</span><h2 id="exp-h">Tres reglas para multimedios accesibles</h2></div>
+      <p class="stop-sub">Una cápsula visual con subtítulos sincronizados, en lugar de un video narrado — así cualquiera puede seguirla sin depender del audio. Use los controles o las flechas del teclado.</p>
+
+      <div class="board">
+        <div class="frame" id="frameStage">
+          <!-- filled by JS -->
+        </div>
+        <div class="dots" id="dots" role="tablist" aria-label="Reglas"></div>
+        <div class="captionbar" id="captionBar" role="status" aria-live="polite"></div>
+        <div class="controls">
+          <button class="ctl-btn" id="prevFrame" aria-label="Regla anterior">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            Anterior
+          </button>
+          <button class="ctl-btn primary" id="playPause" aria-label="Reproducir">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+            Reproducir
+          </button>
+          <button class="ctl-btn" id="nextFrame" aria-label="Siguiente regla">
+            Siguiente
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <details class="transcript">
+          <summary>Ver transcripción completa</summary>
+          <div class="t-body">
+            <p><strong>Regla 1.</strong> No sature: combine imagen y voz o texto breve, nunca los tres narrando lo mismo al mismo tiempo. Leer en pantalla exactamente lo que también se narra en audio divide la atención en vez de reforzar el mensaje (Mayer, 2021).</p>
+            <p><strong>Regla 2.</strong> Todo video lleva subtítulos y, de ser posible, una transcripción descargable: así llega tanto a quien no puede escuchar el audio como a quien prefiere leer a su propio ritmo (W3C, 2023).</p>
+            <p><strong>Regla 3.</strong> Toda imagen informativa lleva un texto alternativo que describe su función en la clase, no solo su apariencia. Un texto alternativo útil dice qué aporta la imagen al tema, no de qué color es (W3C, 2023).</p>
+            <p><strong>Regla 4.</strong> Ofrezca el mismo contenido en más de un formato —video, audio, texto— para que cada estudiante elija cómo acceder a él según su situación y sus preferencias (CAST, 2024).</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- 3. QUIZ -->
+    <section class="stop" id="quiz" aria-labelledby="quiz-h">
+      <div class="stopnum"><span class="n" aria-hidden="true">3</span><h2 id="quiz-h">Ponte a prueba</h2></div>
+      <p class="stop-sub">Cinco situaciones de aula virtual. Elija una opción por pregunta; la retroalimentación aparece de inmediato.</p>
+      <div class="card">
+        <form id="quizForm" novalidate>
+
+          <fieldset class="q" data-correct="a">
+            <legend>1. Un estudiante con baja visión toma su clase. Usted sube una infografía con datos importantes, sin más explicación. ¿Qué debería añadir para que la imagen sea accesible?</legend>
+            <label class="opt"><input type="radio" name="q1" value="a"> Un texto alternativo (alt) que describa la información clave de la infografía.</label>
+            <label class="opt"><input type="radio" name="q1" value="b"> Nada: basta con que el color de fondo sea llamativo.</label>
+            <label class="opt"><input type="radio" name="q1" value="c"> Un pie de foto con el nombre de quien diseñó la infografía.</label>
+            <label class="opt"><input type="radio" name="q1" value="d"> Aumentar el tamaño del archivo de la imagen.</label>
+            <div class="qfeedback" data-for="q1"></div>
+          </fieldset>
+
+          <fieldset class="q" data-correct="b">
+            <legend>2. Va a subir un video explicativo de seis minutos al aula virtual. ¿Qué acción mejora más su accesibilidad?</legend>
+            <label class="opt"><input type="radio" name="q2" value="a"> Subirlo en la resolución más alta posible.</label>
+            <label class="opt"><input type="radio" name="q2" value="b"> Agregarle subtítulos y una transcripción descargable.</label>
+            <label class="opt"><input type="radio" name="q2" value="c"> Configurarlo para que se reproduzca automáticamente.</label>
+            <label class="opt"><input type="radio" name="q2" value="d"> Acortarlo a tres minutos sin cambiar nada más.</label>
+            <div class="qfeedback" data-for="q2"></div>
+          </fieldset>
+
+          <fieldset class="q" data-correct="b">
+            <legend>3. Según el Diseño Universal para el Aprendizaje (CAST, 2024), ¿cuál es la mejor forma de presentar un mismo contenido a un grupo diverso?</legend>
+            <label class="opt"><input type="radio" name="q3" value="a"> Usar siempre un único formato, para mantener la consistencia.</label>
+            <label class="opt"><input type="radio" name="q3" value="b"> Ofrecerlo en más de un formato (texto, audio, imagen) para que cada estudiante elija.</label>
+            <label class="opt"><input type="radio" name="q3" value="c"> Dejar que solo los estudiantes con discapacidad pidan un formato distinto.</label>
+            <label class="opt"><input type="radio" name="q3" value="d"> Evitar los multimedios y usar únicamente texto.</label>
+            <div class="qfeedback" data-for="q3"></div>
+          </fieldset>
+
+          <fieldset class="q" data-correct="b">
+            <legend>4. Prepara una diapositiva con audio narrado. Según el principio de redundancia de Mayer (2021), ¿qué conviene evitar para no saturar la atención del estudiante?</legend>
+            <label class="opt"><input type="radio" name="q4" value="a"> Incluir una imagen relacionada con el tema.</label>
+            <label class="opt"><input type="radio" name="q4" value="b"> Narrar en voz alta exactamente el mismo texto que ya aparece escrito en pantalla, al mismo tiempo.</label>
+            <label class="opt"><input type="radio" name="q4" value="c"> Usar un lenguaje claro y directo.</label>
+            <label class="opt"><input type="radio" name="q4" value="d"> Dividir el contenido en segmentos breves.</label>
+            <div class="qfeedback" data-for="q4"></div>
+          </fieldset>
+
+          <fieldset class="q" data-correct="b">
+            <legend>5. ¿Qué contraste mínimo entre texto y fondo pide WCAG 2.2 para texto normal, de modo que sea legible para alguien con baja visión?</legend>
+            <label class="opt"><input type="radio" name="q5" value="a"> Al menos 3 a 1.</label>
+            <label class="opt"><input type="radio" name="q5" value="b"> Al menos 4.5 a 1.</label>
+            <label class="opt"><input type="radio" name="q5" value="c"> No importa, solo el tamaño de letra es relevante.</label>
+            <label class="opt"><input type="radio" name="q5" value="d"> Cualquier combinación de colores es válida.</label>
+            <div class="qfeedback" data-for="q5"></div>
+          </fieldset>
+
+          <div class="quizfoot">
+            <button type="submit" class="ctl-btn primary" id="quizSubmit">Revisar respuestas</button>
+            <button type="button" class="ctl-btn" id="quizReset" hidden>Volver a intentar</button>
+            <span id="quizScore" class="hidden" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 4. CASO PRACTICO -->
+    <section class="stop" id="caso" aria-labelledby="caso-h">
+      <div class="stopnum"><span class="n" aria-hidden="true">4</span><h2 id="caso-h">Caso práctico: planear una clase virtual inclusiva</h2></div>
+      <p class="stop-sub">Cuatro decisiones reales de planeación. Cada elección queda registrada en el plan de clase que se arma al final.</p>
+      <div class="card">
+        <p class="lead">Usted imparte Biología en segundo año de bachillerato, en modalidad virtual. Esta semana el tema es el ciclo del agua. En el grupo participan:</p>
+        <div class="scenario-people">
+          <div class="person">
+            <span class="av" aria-hidden="true">A</span>
+            <div><strong>Alejandro</strong><span>Hipoacusia moderada; se apoya en lectura labial y en subtítulos.</span></div>
+          </div>
+          <div class="person">
+            <span class="av" aria-hidden="true">F</span>
+            <div><strong>Fernanda</strong><span>Baja visión; usa un lector de pantalla con texto ampliado.</span></div>
+          </div>
+        </div>
+
+        <div class="decision" data-id="d1">
+          <h3>Decisión 1 · ¿Cómo presenta el video introductorio del ciclo del agua?</h3>
+          <div class="choice-row">
+            <button type="button" class="choice" data-good="false">Lo subo tal como lo grabé, sin subtítulos; el audio ya es claro.</button>
+            <button type="button" class="choice" data-good="true">Le agrego subtítulos sincronizados y una transcripción descargable.</button>
+          </div>
+          <p class="dfeedback"></p>
+        </div>
+
+        <div class="decision" data-id="d2">
+          <h3>Decisión 2 · ¿Cómo entrega el diagrama del ciclo del agua?</h3>
+          <div class="choice-row">
+            <button type="button" class="choice" data-good="false">Un diagrama a color, sin texto alternativo ni descripción.</button>
+            <button type="button" class="choice" data-good="true">El mismo diagrama, con un texto alternativo que describe cada etapa.</button>
+          </div>
+          <p class="dfeedback"></p>
+        </div>
+
+        <div class="decision" data-id="d3">
+          <h3>Decisión 3 · ¿En qué formato entrega la lectura complementaria?</h3>
+          <div class="choice-row">
+            <button type="button" class="choice" data-good="false">Solo en PDF escaneado como imagen.</button>
+            <button type="button" class="choice" data-good="true">En PDF con texto seleccionable, compatible con lector de pantalla.</button>
+          </div>
+          <p class="dfeedback"></p>
+        </div>
+
+        <div class="decision" data-id="d4">
+          <h3>Decisión 4 · ¿Cómo organiza la actividad de cierre?</h3>
+          <div class="choice-row">
+            <button type="button" class="choice" data-good="false">Un único formato: responder un cuestionario escrito en diez minutos.</button>
+            <button type="button" class="choice" data-good="true">Dos formas de entregar la respuesta: por escrito o grabando un audio breve.</button>
+          </div>
+          <p class="dfeedback"></p>
+        </div>
+
+        <div class="plan-box">
+          <h3>Su plan de clase para esta semana</h3>
+          <div id="planText"><span class="muted-empty">Tome las cuatro decisiones de arriba para armar el plan.</span></div>
+          <div id="planTally" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. CHECKLIST -->
+    <section class="stop" id="checklist" aria-labelledby="check-h">
+      <div class="stopnum"><span class="n" aria-hidden="true">5</span><h2 id="check-h">Lista de verificación de accesibilidad</h2></div>
+      <p class="stop-sub">Reutilícela antes de publicar cualquier material propio en el aula virtual.</p>
+      <div class="card">
+        <div class="progress-wrap">
+          <div class="progress-top">
+            <span class="label">Material listo para publicarse</span>
+            <span class="pct" id="progressPct">0 %</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <p class="progress-msg" id="progressMsg" role="status" aria-live="polite">Apenas comenzando.</p>
+        </div>
+
+        <div id="checkItems">
+          <div class="check-item"><input type="checkbox" id="c1"><label for="c1">Las imágenes informativas tienen texto alternativo (alt) que describe su contenido.</label></div>
+          <div class="check-item"><input type="checkbox" id="c2"><label for="c2">Los videos incluyen subtítulos o transcripción.</label></div>
+          <div class="check-item"><input type="checkbox" id="c3"><label for="c3">El contraste entre texto y fondo es de al menos 4.5 a 1.</label></div>
+          <div class="check-item"><input type="checkbox" id="c4"><label for="c4">El contenido se ofrece en más de un formato (texto, audio, imagen).</label></div>
+          <div class="check-item"><input type="checkbox" id="c5"><label for="c5">Todos los botones y enlaces se pueden usar solo con teclado.</label></div>
+          <div class="check-item"><input type="checkbox" id="c6"><label for="c6">El lenguaje usado es claro y evita tecnicismos innecesarios.</label></div>
+          <div class="check-item"><input type="checkbox" id="c7"><label for="c7">El tamaño del texto se puede ajustar sin que el contenido se rompa.</label></div>
+          <div class="check-item"><input type="checkbox" id="c8"><label for="c8">Los documentos descargables tienen texto seleccionable, no solo una imagen escaneada.</label></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. CIERRE -->
+    <section class="stop" id="cierre" aria-labelledby="cierre-h">
+      <div class="stopnum"><span class="n" aria-hidden="true">6</span><h2 id="cierre-h">Para profundizar</h2></div>
+      <div class="card">
+        <p class="quote">Ningún multimedio es inclusivo por el solo hecho de usar tecnología reciente: lo es cuando alguien, al diseñarlo, decidió a propósito que nadie quedara fuera.</p>
+        <p class="lead" style="margin-top:16px;">Las tres herramientas de esta página —la cápsula con subtítulos, el cuestionario y el caso práctico— están pensadas para usarse más de una vez: como repaso propio antes de publicar un material, o como punto de partida para revisar, en equipo docente, los multimedios que ya están subidos al aula virtual. La lista de verificación de la sección anterior puede copiarse y aplicarse a cualquier recurso, no solo a los de esta actividad.</p>
+
+        <h3 id="refs-h" style="font-size:1rem; margin-top:26px; margin-bottom:4px;">Referencias</h3>
+        <ul class="refs" aria-labelledby="refs-h">
+          <li>CAST. (2024). <em>Universal Design for Learning guidelines</em> (versión 3.0). https://udlguidelines.cast.org</li>
+          <li>Mayer, R. E. (2021). <em>Multimedia learning</em> (3.ª ed.). Cambridge University Press.</li>
+          <li>UNESCO. (2017). <em>Guía para asegurar la inclusión y la equidad en la educación</em>. UNESCO. https://unesdoc.unesco.org/ark:/48223/pf0000259592</li>
+          <li>Valero Duboy, M. Á. (2010). Tecnologías para la educación inclusiva: de la integración a la interacción. En P. Arnaiz Sánchez, M. D. Hurtado Montesinos y F. J. Soto Pérez (Eds.), <em>25 años de integración escolar en España: tecnología e inclusión en el ámbito educativo, laboral y comunitario</em> (pp. 1–5). Consejería de Educación, Formación y Empleo de la Región de Murcia.</li>
+          <li>World Wide Web Consortium. (2023). <em>Web Content Accessibility Guidelines (WCAG) 2.2</em>. W3C. https://www.w3.org/TR/WCAG22/</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="page">
+    <span>Actividad en línea · subtema «Uso de multimedios en el aula virtual» · Tecnologías para la educación inclusiva</span>
+    <span>Diseño Universal para el Aprendizaje (CAST, 2024) · WCAG 2.2 (W3C, 2023)</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Text size control ---------- */
+  var sizeSteps = [15, 16, 17, 18, 20];
+  var sizeIdx = 1;
+  function applySize(){ document.documentElement.style.fontSize = sizeSteps[sizeIdx] + "px"; }
+  document.getElementById("textSmaller").addEventListener("click", function(){ sizeIdx = Math.max(0, sizeIdx - 1); applySize(); });
+  document.getElementById("textBigger").addEventListener("click", function(){ sizeIdx = Math.min(sizeSteps.length - 1, sizeIdx + 1); applySize(); });
+  document.getElementById("textReset").addEventListener("click", function(){ sizeIdx = 1; applySize(); });
+
+  /* ---------- Storyboard / explainer ---------- */
+  var frames = [
+    {
+      title: "No satures la atención",
+      caption: "Regla 1 — Combina imagen y voz o texto breve; nunca narres en audio exactamente lo mismo que ya está escrito en pantalla (Mayer, 2021).",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="icon" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M3 9h18M8 16v4h8v-4"/><circle cx="8" cy="7" r="1" fill="currentColor" stroke="none"/><path d="M12 7h6"/></svg>'
+    },
+    {
+      title: "Todo video, con subtítulos",
+      caption: "Regla 2 — Agrega subtítulos y, si puedes, una transcripción descargable: así el video llega también a quien no escucha el audio (W3C, 2023).",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="icon" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 20h10M6.5 10.5h2M10 10.5h4M15 10.5h2.5" stroke-width="1.4"/></svg>'
+    },
+    {
+      title: "Describe, no decores",
+      caption: "Regla 3 — Toda imagen informativa lleva un texto alternativo que explica qué aporta al tema, no de qué color es (W3C, 2023).",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="icon" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5-9 9"/></svg>'
+    },
+    {
+      title: "Un mismo contenido, varios caminos",
+      caption: "Regla 4 — Ofrece el contenido en más de un formato (video, audio, texto) para que cada estudiante elija el suyo (CAST, 2024).",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="icon" aria-hidden="true"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 11l7.8-4M8.2 13l7.8 4"/></svg>'
+    }
+  ];
+  var frameStage = document.getElementById("frameStage");
+  var captionBar = document.getElementById("captionBar");
+  var dotsWrap = document.getElementById("dots");
+  var playBtn = document.getElementById("playPause");
+  var playIcon = document.getElementById("playIcon");
+  var curFrame = 0, playing = false, playTimer = null;
+
+  frames.forEach(function(f, i){
+    var d = document.createElement("button");
+    d.className = "dot"; d.type = "button";
+    d.setAttribute("role", "tab");
+    d.setAttribute("aria-label", "Regla " + (i + 1) + ": " + f.title);
+    d.addEventListener("click", function(){ goTo(i); stopPlay(); });
+    dotsWrap.appendChild(d);
+  });
+
+  function render(){
+    var f = frames[curFrame];
+    frameStage.innerHTML = f.icon +
+      '<span class="rule-no">Regla ' + (curFrame + 1) + ' de ' + frames.length + '</span>' +
+      '<span class="rule-title">' + f.title + '</span>';
+    captionBar.textContent = f.caption;
+    Array.prototype.forEach.call(dotsWrap.children, function(d, i){
+      d.setAttribute("aria-current", i === curFrame ? "true" : "false");
+    });
+  }
+  function goTo(i){ curFrame = (i + frames.length) % frames.length; render(); }
+  function stopPlay(){
+    playing = false;
+    if (playTimer) { clearInterval(playTimer); playTimer = null; }
+    playBtn.setAttribute("aria-label", "Reproducir");
+    playIcon.outerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="playIcon"><path d="M8 5v14l11-7z"/></svg>';
+    playIcon = document.getElementById("playIcon");
+    playBtn.childNodes[playBtn.childNodes.length - 1].textContent = " Reproducir";
+  }
+  function startPlay(){
+    playing = true;
+    playBtn.setAttribute("aria-label", "Pausar");
+    playIcon.outerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="playIcon"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
+    playIcon = document.getElementById("playIcon");
+    playBtn.childNodes[playBtn.childNodes.length - 1].textContent = " Pausar";
+    playTimer = setInterval(function(){ goTo(curFrame + 1); }, 4200);
+  }
+  document.getElementById("prevFrame").addEventListener("click", function(){ goTo(curFrame - 1); stopPlay(); });
+  document.getElementById("nextFrame").addEventListener("click", function(){ goTo(curFrame + 1); stopPlay(); });
+  playBtn.addEventListener("click", function(){ playing ? stopPlay() : startPlay(); });
+  document.querySelector(".board").addEventListener("keydown", function(e){
+    if (e.key === "ArrowLeft") { goTo(curFrame - 1); stopPlay(); }
+    if (e.key === "ArrowRight") { goTo(curFrame + 1); stopPlay(); }
+  });
+  render();
+
+  /* ---------- Quiz ---------- */
+  var quizForm = document.getElementById("quizForm");
+  var quizScore = document.getElementById("quizScore");
+  var quizSubmit = document.getElementById("quizSubmit");
+  var quizReset = document.getElementById("quizReset");
+
+  var explain = {
+    q1: { ok: "Correcto: el texto alternativo permite que un lector de pantalla transmita la información de la infografía.", bad: "El color de fondo no comunica el contenido. Sin un texto alternativo, un lector de pantalla no puede describir la infografía." },
+    q2: { ok: "Correcto: subtítulos y transcripción hacen que el video llegue también a quien no puede escuchar el audio.", bad: "La resolución, la reproducción automática y la duración no resuelven el acceso al contenido para quien no escucha el audio." },
+    q3: { ok: "Correcto: ofrecer varios formatos es justamente el principio de representación múltiple del DUA.", bad: "Reducir las opciones, o limitarlas solo a quien pide una adaptación, va en contra del principio de representación múltiple del DUA." },
+    q4: { ok: "Correcto: narrar en voz alta el mismo texto que ya está en pantalla divide la atención en vez de reforzar el mensaje (principio de redundancia).", bad: "Esa acción sí ayuda a la comprensión; lo que conviene evitar es narrar en voz alta el mismo texto que ya aparece escrito." },
+    q5: { ok: "Correcto: WCAG 2.2 pide un contraste mínimo de 4.5 a 1 para texto normal.", bad: "El contraste mínimo que pide WCAG 2.2 para texto normal es 4.5 a 1; el tamaño de letra por sí solo no basta." }
+  };
+
+  quizForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var fieldsets = quizForm.querySelectorAll("fieldset.q");
+    var answered = 0, correct = 0;
+    fieldsets.forEach(function(fs){
+      var name = fs.querySelector("input").name;
+      var chosen = fs.querySelector('input[name="' + name + '"]:checked');
+      var fb = fs.querySelector('.qfeedback[data-for="' + name + '"]');
+      if (!chosen) { fb.classList.remove("show", "ok", "bad"); return; }
+      answered++;
+      var isCorrect = chosen.value === fs.getAttribute("data-correct");
+      if (isCorrect) correct++;
+      fb.classList.add("show");
+      fb.classList.toggle("ok", isCorrect);
+      fb.classList.toggle("bad", !isCorrect);
+      var icon = isCorrect
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+      fb.innerHTML = icon + '<span>' + (isCorrect ? explain[name].ok : explain[name].bad) + '</span>';
+    });
+    if (answered < fieldsets.length) {
+      quizScore.className = "";
+      quizScore.textContent = "Responda las " + fieldsets.length + " preguntas para ver su resultado (van " + answered + " de " + fieldsets.length + ").";
+      return;
+    }
+    quizScore.className = "";
+    quizScore.textContent = "Resultado: " + correct + " de " + fieldsets.length + " correctas.";
+    quizSubmit.hidden = true;
+    quizReset.hidden = false;
+    quizForm.querySelectorAll("input[type=radio]").forEach(function(r){ r.disabled = true; });
+  });
+
+  quizReset.addEventListener("click", function(){
+    quizForm.reset();
+    quizForm.querySelectorAll("input[type=radio]").forEach(function(r){ r.disabled = false; });
+    quizForm.querySelectorAll(".qfeedback").forEach(function(fb){ fb.classList.remove("show", "ok", "bad"); fb.innerHTML = ""; });
+    quizScore.className = "hidden";
+    quizScore.textContent = "";
+    quizSubmit.hidden = false;
+    quizReset.hidden = true;
+  });
+
+  /* ---------- Caso práctico ---------- */
+  var planLines = {
+    d1: { true: "sube el video del ciclo del agua con subtítulos sincronizados y transcripción descargable", false: "sube el video del ciclo del agua sin subtítulos" },
+    d2: { true: "incluye el diagrama del ciclo del agua con un texto alternativo que describe cada etapa", false: "incluye el diagrama del ciclo del agua sin texto alternativo" },
+    d3: { true: "entrega la lectura complementaria en un PDF con texto seleccionable", false: "entrega la lectura complementaria en un PDF escaneado como imagen" },
+    d4: { true: "cierra con una actividad que puede entregarse por escrito o en audio", false: "cierra con una actividad en un único formato escrito" }
+  };
+  var decisions = {};
+  document.querySelectorAll(".decision").forEach(function(dec){
+    var id = dec.getAttribute("data-id");
+    var buttons = dec.querySelectorAll(".choice");
+    var fb = dec.querySelector(".dfeedback");
+    buttons.forEach(function(btn){
+      btn.addEventListener("click", function(){
+        buttons.forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+        btn.setAttribute("aria-pressed", "true");
+        var good = btn.getAttribute("data-good") === "true";
+        decisions[id] = good;
+        fb.classList.add("show");
+        fb.textContent = good
+          ? "Así tanto Alejandro como Fernanda pueden acceder al material por su cuenta."
+          : "Con esta opción, Alejandro o Fernanda quedarían dependiendo de ayuda extra para acceder al mismo material que el resto del grupo.";
+        updatePlan();
+      });
+    });
+  });
+
+  function updatePlan(){
+    var ids = ["d1", "d2", "d3", "d4"];
+    var made = ids.filter(function(id){ return decisions.hasOwnProperty(id); });
+    var planTextEl = document.getElementById("planText");
+    var tallyEl = document.getElementById("planTally");
+    if (made.length === 0) {
+      planTextEl.innerHTML = '<span class="muted-empty">Tome las cuatro decisiones de arriba para armar el plan.</span>';
+      tallyEl.textContent = "";
+      return;
+    }
+    var parts = made.map(function(id){ return planLines[id][decisions[id]]; });
+    var sentence = "Para esta clase, usted " + parts.join("; ") + ".";
+    planTextEl.textContent = sentence;
+    if (made.length === ids.length) {
+      var goodCount = ids.filter(function(id){ return decisions[id] === true; }).length;
+      tallyEl.textContent = "Decisiones alineadas con el Diseño Universal para el Aprendizaje: " + goodCount + " de " + ids.length + ".";
+    } else {
+      tallyEl.textContent = "Faltan " + (ids.length - made.length) + " decisión(es) por tomar.";
+    }
+  }
+
+  /* ---------- Checklist ---------- */
+  var checks = Array.prototype.slice.call(document.querySelectorAll('#checkItems input[type="checkbox"]'));
+  var progressFill = document.getElementById("progressFill");
+  var progressPct = document.getElementById("progressPct");
+  var progressMsg = document.getElementById("progressMsg");
+  var msgFor = function(pct){
+    if (pct === 0) return "Apenas comenzando.";
+    if (pct < 50) return "En camino.";
+    if (pct < 75) return "Buen avance.";
+    if (pct < 100) return "Casi listo.";
+    return "Material listo para publicarse.";
+  };
+  function updateProgress(){
+    var done = checks.filter(function(c){ return c.checked; }).length;
+    var pct = Math.round((done / checks.length) * 100);
+    progressFill.style.width = pct + "%";
+    progressFill.classList.toggle("done", pct === 100);
+    progressPct.textContent = pct + " %";
+    progressPct.classList.toggle("done", pct === 100);
+    progressMsg.textContent = msgFor(pct);
+  }
+  checks.forEach(function(c){ c.addEventListener("change", updateProgress); });
+  updateProgress();
+})();
+</script>
